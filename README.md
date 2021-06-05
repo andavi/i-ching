@@ -1,6 +1,6 @@
-# brandub
+# iChing
 
-Ancient board game reconstructed
+The ancient oracle
 
 ---
 
