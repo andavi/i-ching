@@ -42,7 +42,7 @@ class App extends React.Component {
                 The Book of Changes
               </p>
           </header>
-          {this.state.beenWelcomed ? <Authenticate /> : <Welcome handleClick={this.props.handleClick} /> }
+          {this.state.beenWelcomed ? <Authenticate /> : <Welcome handleClick={this.handleClick} /> }
       </div>
     );
   }
