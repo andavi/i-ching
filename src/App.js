@@ -1,23 +1,8 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import Button from 'react-bootstrap/Button';
-
-function Welcome(props) {
-  return (
-    <div className="Welcome">
-      <img src={logo} className="Welcome-logo" alt="logo" />
-      {/* <button className="App-button" onClick={ props.handleClick }>Login</button> */}
-      <Button variant="outline-light" block onClick={props.handleClick}>Login</Button>
-    </div>
-  )
-}
-
-function Authenticate(props) {
-  return (
-    <h1>Welcome</h1>
-  )
-}
+import Header from './components/Header.js';
+import Welcome from './views/Welcome.js';
+import Authenticate from './views/Authenticate.js';
 
 
 class App extends React.Component {
@@ -36,12 +21,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-          <header className="App-header">
-            <h1>I-Ching</h1>
-              <p>
-                The Book of Changes
-              </p>
-          </header>
+          <Header />
           {this.state.beenWelcomed ? <Authenticate /> : <Welcome handleClick={this.handleClick} /> }
       </div>
     );
