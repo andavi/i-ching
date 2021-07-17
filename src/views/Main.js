@@ -7,8 +7,11 @@ export default function Main() {
     // const [sentiment, setSentiment] = React.useState(null);
 
     return (
-        <Form>
-            <h1>Main</h1>
-        </Form>
+        <>
+            <h1>{this.props.username}'s Main Page</h1>
+            <Form>
+            Form
+            </Form>
+        </>
     )
 }

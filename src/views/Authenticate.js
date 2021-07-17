@@ -1,28 +1,34 @@
 import React from 'react';
+import logo from './logo.svg';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import TextInput from '../components/TextInput.js';
-import { render } from '@testing-library/react';
+// import { render } from '@testing-library/react';
 // import { propTypes } from 'react-bootstrap/esm/Image';
 
 
 export default function Authenticate(props) {
-
+    const [welcomed, setWelcomed] = React.useState(false);
     const [loggingIn, setLoggingIn] = React.useState(true);
     // const [username, setUsername] = React.useState('');
-    const [password, setPassword] = React.useState('');
+    // const [password, setPassword] = React.useState('');
+
+    // let welcomed = false;
+    // let loggingIn = true;
+    let un = '';
+    let pw = '';
+    let pwc = '';
 
     function handleInputChange(e) {
         const inputText = e.target.value;
         const inputName = e.target.name;
-        let un
 
         if (inputName === 'username') {
-            setUsername(inputText);
+            un = inputText;
         } else if (inputName === 'password') {
-            setPassword(inputText);
+            pw = inputText;
         } else if (inputName === 'password-confirm') {
-
+            pwc = inputText;
         }
     }
 
@@ -36,44 +42,52 @@ export default function Authenticate(props) {
     function handleSubmit(e) {
         e.preventDefault();
         const formElements = e.target.elements;
-        const [formMistakes, badCredentials] =  authenticate(formElements, [username, password]); // TODO
-        if (formMistakes || badCredentials) {
-            return showMistakes(formMistakes, badCredentials);  // TODO
+        const [badCredentials] =  authenticate(formElements, [un, pw, pwc]); // TODO
+        if (badCredentials) {
+            return showMistakes(badCredentials);  // TODO
         } 
 
-        setUsername(username);
-        props.setState(state => ({
-            beenWelcomed: true,
-            isAuthennticated: true,
-            username: username
-          }))
+        // setUsername(username);
+       this.props.onAuthenticated(e.target.elements.username.value);
     }
 
-    function toggleLogin(e) {
-        setLoggingIn(!loggingIn);
-    }
+    // function handleWelcomed() {
+    //     setWelcomed(true);
+    // }
+
+    // function toggleLogin(e) {
+    //     loggingIn = !loggingIn;
+    // }
 
         return (
+            !welcomed 
+                ? 
+                <div className="Welcome">
+                    <img src={logo} className="Welcome-logo" alt="logo" />
+                    <Button variant="outline-light" block onClick={() => setWelcomed(true)}>Login</Button>
+                </div>
+                : 
             <>
-        <Form onSubmit={handleSubmit}>
+                <Form onSubmit={handleSubmit}>
 
-                <h2>{loggingIn ? 'Login' : 'Register'}</h2>
+                    <h2>{loggingIn ? 'Login' : 'Register'}</h2>
 
-                <TextInput controlId="formBasicUsername" label="Username" name="username" type="username" placeholder="Enter Username" onChange={setUsername} />
+                    <TextInput controlId="formBasicUsername" label="Username" name="username" type="username" placeholder="Enter Username" onChange={handleInputChange} />
 
-                <TextInput controlId="formBasicPassword" label="Password" name="password" type="password" placeholder="Enter Password" onChange={handleInputChange}/>
+                    <TextInput controlId="formBasicPassword" label="Password" name="password" type="password" placeholder="Enter Password" onChange={handleInputChange}/>
 
-                {loggingIn || (
-                    <TextInput controlId="formBasicPassword" label="PasswordConfirm" name="password-confirm" type="password" placeholder="Confirm Password" onChange={handleInputChange}/>
-                )}
+                    {loggingIn || (
+                        <TextInput controlId="formBasicPassword" label="PasswordConfirm" name="password-confirm" type="password" placeholder="Confirm Password" onChange={handleInputChange}/>
+                    )}
 
 
-                <Button variant="outline-light" type="submit" block onClick={handleClick}>
-                    Submit
-                </Button>
+                    <Button variant="outline-light" type="submit" block onClick={handleClick}>
+                        Submit
+                    </Button>
 
-        </Form>
-        <Button variant="link" onClick={toggleLogin}>{!loggingIn ? 'Login' : 'Register'}</Button>
-        </>
+                </Form>
+                <Button variant="link" onClick={() => setLoggingIn(!loggingIn)}>{!loggingIn ? 'Login' : 'Register'}</Button>
+            </>
+        
     );
 };
