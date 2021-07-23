@@ -1,62 +1,25 @@
 /* Using Kennedy probabilities we will simply get a 
     random int [1,38]  */
 
-// const range = (start, end, length = end - start + 1) => [...Array(length).keys()].map(d => d + start);
-function range(start, end) {
-    var ans = [];
-    for (let i = start; i <= end; i++) {
-        ans.push(i);
-    }
-    return ans;
-}
-
-
-
-// const probabilities = {
-//     kennedy: {
-//         movingYang: range(1, 8),  //  8/38
-//         movingYin: range(9, 10),  //  2/38
-//         staticYang: range(11, 21),  //  11/38
-//         staticYin: range(22, 38),  //  17/38,
-//         total: 38
-//     },
-//     yarrow: {
-//         movingYang: range(1, 3),  //  3/16
-//         movingYin: range(4, 4),  //  1/16
-//         staticYang: range(5, 9),  //  5/16
-//         staticYin: range(10, 16),  //  7/16
-//         total: 16
-//     },
-//     coin: {
-//         movingYang: range(1, 1),  //  1/8
-//         movingYin: range(2,2),  //  1/8
-//         staticYang: range(3, 5),  //  3/8
-//         staticYin: range(6, 8),  //  3/8
-//         total: 8
-//     }
-// }
 
 const probabilities = {
     kennedy: {
-        movingYang: 8,  //  8/38
-        movingYin: 10,  //  2/38
-        staticYang: 21,  //  11/38
-        staticYin: 38,  //  17/38,
-        total: 38
+        staticYin: 17,  //  17/38,
+        staticYang: 28,  //  11/38
+        movingYin: 30,  //  2/38
+        movingYang: 38,  //  8/38
     },
     yarrow: {
-        movingYang: range(1, 3),  //  3/16
-        movingYin: range(4, 4),  //  1/16
-        staticYang: range(5, 9),  //  5/16
-        staticYin: range(10, 16),  //  7/16
-        total: 16
+        staticYin: 7,  //  7/16
+        staticYang: 12,  //  5/16
+        movingYin: 13,  //  1/16
+        movingYang: 16,  //  3/16
     },
     coin: {
-        movingYang: range(1, 1),  //  1/8
-        movingYin: range(2,2),  //  1/8
-        staticYang: range(3, 5),  //  3/8
-        staticYin: range(6, 8),  //  3/8
-        total: 8
+        staticYin: 3,  //  3/8
+        staticYang: 6,  //  3/8
+        movingYin: 7,  //  1/8
+        movingYang: 8,  //  1/8
     }
 }
 
@@ -65,40 +28,103 @@ function getRndInteger(min, max) {
 }
 
 function getLines(method) {
-    const {movingYang, movingYin, staticYang, staticYin, total} = probabilities[method];
-    // console.log(movingYang);
-    // console.log(movingYin);
-    // console.log(staticYang);
-    // console.log(staticYin);
-    // console.log(total);
+    const {movingYang, movingYin, staticYang, staticYin} = probabilities[method];
+    const total = movingYang;
     const lines = [];
-    const rnds = [];
+    const randNums = [];
     for (let i = 0; i < 6; i++) {
         let rndNum = getRndInteger(1, total);
-        rnds.push(rndNum);
-        if (rndNum <= movingYang) {
+        randNums.push(rndNum);
+        if (rndNum <= staticYin) {
             lines.push(0);
-        } else if (rndNum <= movingYin) {
-            lines.push(1);
         } else if (rndNum <= staticYang) {
+            lines.push(1);
+        } else if (rndNum <= movingYin) {
             lines.push(2);
-        } else if (rndNum <= staticYin) {
+        } else if (rndNum <= movingYang) {
             lines.push(3);
         } else {
             console.error('rndNum out of bounds: ' + rndNum);
         }
     }
-    console.log(rnds);
+    console.log(randNums);
+    return lines;
+}
+
+function huangReducer(lines) {
+    let changingLine = null;
+    const changingLines = [];
+    const staticLines = [];
+    lines.forEach((l, i) => {
+        if (l > 1) {
+            changingLines.push(i);
+        } else {
+            staticLines.push(i);
+        }
+    });
+    const totalChanging = changingLines.length;
+    switch (totalChanging){
+
+        case 1: 
+            changingLine = changingLines[0];
+            break;
+        
+        case 2:
+            if (lines[changingLines[0]] !== lines[changingLines[1]]) {
+                 changingLine = (lines[changingLines[0]] === 2) ? changingLines[0] 
+                    : changingLines[1];
+            } else {
+                changingLine = changingLines[0];
+            }
+            break;
+
+        case 3:
+            changingLine = changingLines[1];
+            break;
+        
+        case 4:
+            changingLine = staticLines[1];
+            break;
+
+        case 5:
+            changingLine = staticLines[0];
+            break;
+
+        case 6:
+            if (lines.reduce((a, b) => a + b) === 12 || lines.reduce((a,b) => a + b) === 18) {
+                changingLine = 6;
+            } else {
+                lines = lines.map(l => l ^ 3); // XOR bitwise op to move all lines
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    // switch to all 0's and 1's in lines, and return array and changingLine
+    lines = lines.map(l => l & 1); // bitwise mask leaving only last bit 
+    lines.push(changingLine); // for convenience just pushing the index of changingLine
+
     return lines;
 }
 
 function getHex(method='kennedy') {
-    const lines = getLines(method);
+    let lines = getLines(method);
     console.log(lines);
 
-    const table = ['⚊*', '⚋*', '⚊', '⚋'];
+    lines = huangReducer(lines);
+
+    const changingLine = lines.pop();
+
+    const table = ['⚋', '⚊'];
 
     const hexagram = lines.map(n => table[n]);
+    if (changingLine !== null) {
+        if (changingLine < 6) {
+            hexagram[changingLine] = '*' + hexagram[changingLine];
+        } else hexagram.push('*******'); // special case where all changing lines on first or second gua 
+    }
     while(hexagram.length) {
         console.log(hexagram.pop());
     }
